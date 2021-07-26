@@ -112,13 +112,13 @@ stages:
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
 
 - stage: 'Staging'
-  displayName: 'Deploy to the staging environment'
-  dependsOn: Test
+  displayName: 'Deploy to the stage environment'
+  dependsOn: Dev
   jobs:
   - deployment: Deploy
     pool:
       vmImage: 'ubuntu-20.04'
-    environment: staging
+    environment: test
     variables:
     - group: 'Release'
     strategy:
@@ -131,17 +131,5 @@ stages:
             displayName: 'Azure App Service Deploy: website'
             inputs:
               azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              deployToSlotOrASE: 'true'
-              resourceGroupName: 'tailspin-space-game-rg'
-              slotName: 'swap'
-              appName: '$(WebAppNameStaging)'
+              appName: '$(WebAppNameTest)'
               package: '$(Pipeline.Workspace)/drop/$(buildConfiguration)/*.zip'
-          - task: AzureAppServiceManage@0
-            displayName: 'Swap deployment slots'
-            inputs:
-              azureSubscription: 'Resource Manager - Tailspin - Space Game'
-              resourceGroupName: 'tailspin-space-game-rg'
-              webAppName: '$(WebAppNameStaging)'
-              sourceSlot: 'swap'
-              targetSlot: 'production'
-              action: 'Swap Slots'
